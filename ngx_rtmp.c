@@ -849,7 +849,7 @@ ngx_rtmp_init_conf(ngx_cycle_t *cycle, void *conf)
     ccf = (ngx_core_conf_t *) ngx_get_conf(cycle->conf_ctx, ngx_core_module);
     if (ccf->worker_processes > 1) {
         ngx_log_error(NGX_LOG_EMERG, cycle->log, 0,
-                      "only support singile worker for a nginx-rtmp server");
+                      "only support single worker for a nginx-rtmp server");
         return NGX_CONF_ERROR;
     }
 
