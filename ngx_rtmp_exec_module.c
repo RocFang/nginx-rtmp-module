@@ -599,7 +599,7 @@ ngx_rtmp_exec_init_process(ngx_cycle_t *cycle)
         e->respawn_evt.data = e;
         e->respawn_evt.log = e->log;
         e->respawn_evt.handler = ngx_rtmp_exec_respawn;
-        ngx_post_event((&e->respawn_evt), &ngx_rtmp_init_queue);
+        e->respawn_evt.handler(&e->respawn_evt);
     }
 #endif
 

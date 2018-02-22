@@ -15,7 +15,6 @@
 #include "ngx_rtmp_codec_module.h"
 
 
-static ngx_int_t ngx_rtmp_stat_init_process(ngx_cycle_t *cycle);
 static char *ngx_rtmp_stat(ngx_conf_t *cf, ngx_command_t *cmd, void *conf);
 static ngx_int_t ngx_rtmp_stat_postconfiguration(ngx_conf_t *cf);
 static void * ngx_rtmp_stat_create_loc_conf(ngx_conf_t *cf);
@@ -94,7 +93,7 @@ ngx_module_t  ngx_rtmp_stat_module = {
     NGX_HTTP_MODULE,                    /* module type */
     NULL,                               /* init master */
     NULL,                               /* init module */
-    ngx_rtmp_stat_init_process,         /* init process */
+    NULL,                               /* init process */
     NULL,                               /* init thread */
     NULL,                               /* exit thread */
     NULL,                               /* exit process */
@@ -104,21 +103,6 @@ ngx_module_t  ngx_rtmp_stat_module = {
 
 
 #define NGX_RTMP_STAT_BUFSIZE           256
-
-
-static ngx_int_t
-ngx_rtmp_stat_init_process(ngx_cycle_t *cycle)
-{
-    /*
-     * HTTP process initializer is called
-     * after event module initializer
-     * so we can run posted events here
-     */
-
-    ngx_event_process_posted(cycle, &ngx_rtmp_init_queue);
-
-    return NGX_OK;
-}
 
 
 /* ngx_escape_html does not escape characters out of ASCII range
