@@ -11,6 +11,7 @@
 #include "ngx_rtmp.h"
 
 
+static char *ngx_rtmp_init_conf(ngx_cycle_t *cycle, void *conf);
 static char *ngx_rtmp_block(ngx_conf_t *cf, ngx_command_t *cmd, void *conf);
 static ngx_int_t ngx_rtmp_add_ports(ngx_conf_t *cf, ngx_array_t *ports,
     ngx_rtmp_listen_t *listen);
@@ -50,7 +51,7 @@ static ngx_command_t  ngx_rtmp_commands[] = {
 static ngx_core_module_t  ngx_rtmp_module_ctx = {
     ngx_string("rtmp"),
     NULL,
-    NULL
+    ngx_rtmp_init_conf
 };
 
 
@@ -838,4 +839,19 @@ ngx_rtmp_rmemcpy(void *dst, const void* src, size_t n)
     }
 
     return dst;
+}
+
+
+static char *
+ngx_rtmp_init_conf(ngx_cycle_t *cycle, void *conf)
+{
+    ngx_core_conf_t  *ccf;
+    ccf = (ngx_core_conf_t *) ngx_get_conf(cycle->conf_ctx, ngx_core_module);
+    if (ccf->worker_processes > 1) {
+        ngx_log_error(NGX_LOG_EMERG, cycle->log, 0,
+                      "only support singile worker for a nginx-rtmp server");
+        return NGX_CONF_ERROR;
+    }
+
+    return NGX_CONF_OK;
 }
