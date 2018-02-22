@@ -216,6 +216,12 @@ ngx_rtmp_recv(ngx_event_t *rev)
         return;
     }
 
+    if (ngx_exiting) {
+        ngx_log_error(NGX_LOG_INFO, c->log, 0,
+            "finalize the rtmp session when reload");
+        return ngx_rtmp_finalize_session(s);
+    }
+
     for( ;; ) {
 
         st = &s->in_streams[s->in_csid];
@@ -499,6 +505,12 @@ ngx_rtmp_send(ngx_event_t *wev)
 
     if (c->destroyed) {
         return;
+    }
+
+    if (ngx_exiting) {
+        ngx_log_error(NGX_LOG_INFO, c->log, 0,
+            "finalize the rtmp session when reload");
+        return ngx_rtmp_finalize_session(s);
     }
 
     if (wev->timedout) {
