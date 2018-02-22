@@ -1170,10 +1170,6 @@ ngx_rtmp_exec_publish(ngx_rtmp_session_t *s, ngx_rtmp_publish_t *v)
         goto next;
     }
 
-    if (s->auto_pushed) {
-        goto next;
-    }
-
     if (ngx_rtmp_exec_init_ctx(s, v->name, v->args, NGX_RTMP_EXEC_PUBLISHING)
         != NGX_OK)
     {
@@ -1309,10 +1305,6 @@ ngx_rtmp_exec_record_done(ngx_rtmp_session_t *s, ngx_rtmp_record_done_t *v)
     ngx_uint_t                 ext, dir;
     ngx_rtmp_exec_ctx_t       *ctx;
     ngx_rtmp_exec_app_conf_t  *eacf;
-
-    if (s->auto_pushed) {
-        goto next;
-    }
 
     eacf = ngx_rtmp_get_module_app_conf(s, ngx_rtmp_exec_module);
     if (eacf == NULL || !eacf->active) {

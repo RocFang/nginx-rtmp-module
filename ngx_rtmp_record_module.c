@@ -706,10 +706,6 @@ ngx_rtmp_record_publish(ngx_rtmp_session_t *s, ngx_rtmp_publish_t *v)
     ngx_rtmp_record_ctx_t          *ctx;
     u_char                         *p;
 
-    if (s->auto_pushed) {
-        goto next;
-    }
-
     racf = ngx_rtmp_get_module_app_conf(s, ngx_rtmp_record_module);
 
     if (racf == NULL || racf->rec.nelts == 0) {
@@ -750,16 +746,11 @@ next:
 static ngx_int_t
 ngx_rtmp_record_stream_begin(ngx_rtmp_session_t *s, ngx_rtmp_stream_begin_t *v)
 {
-    if (s->auto_pushed) {
-        goto next;
-    }
-
     ngx_log_debug0(NGX_LOG_DEBUG_RTMP, s->connection->log, 0,
                    "record: stream_begin");
 
     ngx_rtmp_record_start(s);
 
-next:
     return next_stream_begin(s, v);
 }
 
@@ -767,16 +758,11 @@ next:
 static ngx_int_t
 ngx_rtmp_record_stream_eof(ngx_rtmp_session_t *s, ngx_rtmp_stream_begin_t *v)
 {
-    if (s->auto_pushed) {
-        goto next;
-    }
-
     ngx_log_debug0(NGX_LOG_DEBUG_RTMP, s->connection->log, 0,
                    "record: stream_eof");
 
     ngx_rtmp_record_stop(s);
 
-next:
     return next_stream_eof(s, v);
 }
 
@@ -854,16 +840,11 @@ static ngx_int_t
 ngx_rtmp_record_close_stream(ngx_rtmp_session_t *s,
                              ngx_rtmp_close_stream_t *v)
 {
-    if (s->auto_pushed) {
-        goto next;
-    }
-
     ngx_log_debug0(NGX_LOG_DEBUG_RTMP, s->connection->log, 0,
                    "record: close_stream");
 
     ngx_rtmp_record_stop(s);
 
-next:
     return next_close_stream(s, v);
 }
 
