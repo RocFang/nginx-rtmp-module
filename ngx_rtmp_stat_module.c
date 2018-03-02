@@ -11,7 +11,6 @@
 #include "ngx_rtmp.h"
 #include "ngx_rtmp_version.h"
 #include "ngx_rtmp_live_module.h"
-#include "ngx_rtmp_play_module.h"
 #include "ngx_rtmp_codec_module.h"
 
 
@@ -586,78 +585,6 @@ ngx_rtmp_stat_live(ngx_http_request_t *r, ngx_chain_t ***lll,
 
 
 static void
-ngx_rtmp_stat_play(ngx_http_request_t *r, ngx_chain_t ***lll,
-        ngx_rtmp_play_app_conf_t *pacf)
-{
-    ngx_rtmp_play_ctx_t            *ctx, *sctx;
-    ngx_rtmp_session_t             *s;
-    ngx_uint_t                      n, nclients, total_nclients;
-    u_char                          buf[NGX_INT_T_LEN];
-    u_char                          bbuf[NGX_INT32_LEN];
-    ngx_rtmp_stat_loc_conf_t       *slcf;
-
-    if (pacf->entries.nelts == 0) {
-        return;
-    }
-
-    slcf = ngx_http_get_module_loc_conf(r, ngx_rtmp_stat_module);
-
-    NGX_RTMP_STAT_L("<play>\r\n");
-
-    total_nclients = 0;
-    for (n = 0; n < pacf->nbuckets; ++n) {
-        for (ctx = pacf->ctx[n]; ctx; ) {
-            NGX_RTMP_STAT_L("<stream>\r\n");
-
-            NGX_RTMP_STAT_L("<name>");
-            NGX_RTMP_STAT_ECS(ctx->name);
-            NGX_RTMP_STAT_L("</name>\r\n");
-
-            nclients = 0;
-            sctx = ctx;
-            for (; ctx; ctx = ctx->next) {
-                if (ngx_strcmp(ctx->name, sctx->name)) {
-                    break;
-                }
-
-                nclients++;
-
-                s = ctx->session;
-                if (slcf->stat & NGX_RTMP_STAT_CLIENTS) {
-                    NGX_RTMP_STAT_L("<client>");
-
-                    ngx_rtmp_stat_client(r, lll, s);
-
-                    NGX_RTMP_STAT_L("<timestamp>");
-                    NGX_RTMP_STAT(bbuf, ngx_snprintf(bbuf, sizeof(bbuf),
-                                  "%D", s->current_time) - bbuf);
-                    NGX_RTMP_STAT_L("</timestamp>");
-
-                    NGX_RTMP_STAT_L("</client>\r\n");
-                }
-            }
-            total_nclients += nclients;
-
-            NGX_RTMP_STAT_L("<active/>");
-            NGX_RTMP_STAT_L("<nclients>");
-            NGX_RTMP_STAT(buf, ngx_snprintf(buf, sizeof(buf),
-                          "%ui", nclients) - buf);
-            NGX_RTMP_STAT_L("</nclients>\r\n");
-
-            NGX_RTMP_STAT_L("</stream>\r\n");
-        }
-    }
-
-    NGX_RTMP_STAT_L("<nclients>");
-    NGX_RTMP_STAT(buf, ngx_snprintf(buf, sizeof(buf),
-                  "%ui", total_nclients) - buf);
-    NGX_RTMP_STAT_L("</nclients>\r\n");
-
-    NGX_RTMP_STAT_L("</play>\r\n");
-}
-
-
-static void
 ngx_rtmp_stat_application(ngx_http_request_t *r, ngx_chain_t ***lll,
         ngx_rtmp_core_app_conf_t *cacf)
 {
@@ -673,11 +600,6 @@ ngx_rtmp_stat_application(ngx_http_request_t *r, ngx_chain_t ***lll,
     if (slcf->stat & NGX_RTMP_STAT_LIVE) {
         ngx_rtmp_stat_live(r, lll,
                 cacf->app_conf[ngx_rtmp_live_module.ctx_index]);
-    }
-
-    if (slcf->stat & NGX_RTMP_STAT_PLAY) {
-        ngx_rtmp_stat_play(r, lll,
-                cacf->app_conf[ngx_rtmp_play_module.ctx_index]);
     }
 
     NGX_RTMP_STAT_L("</application>\r\n");
